@@ -1,0 +1,10 @@
+--- vmci-only/linux/driver.c	2015-07-24 01:57:39.325409026 -0700
++++ vmci-only/linux/driver.c	2015-07-24 02:01:01.510374448 -0700
+@@ -37,6 +37,7 @@
+ #include <linux/moduleparam.h>
+ #include <linux/poll.h>
+ #include <linux/smp.h>
++#include <linux/vmalloc.h>
+ 
+ #include "compat_highmem.h"
+ #include "compat_interrupt.h"

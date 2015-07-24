@@ -1,0 +1,50 @@
+--- vmci-only/linux/vmciKernelIf.c	2015-07-24 02:06:43.940703183 -0700
++++ vmci-only/linux/vmciKernelIf.c	2015-07-24 02:20:25.329695242 -0700
+@@ -40,6 +40,9 @@
+ #include <linux/socket.h>       /* For memcpy_{to,from}iovec(). */
+ #include <linux/vmalloc.h>
+ #include <linux/wait.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0)
++#include <linux/skbuff.h>
++#endif
+ 
+ #include "compat_highmem.h"
+ #include "compat_interrupt.h"
+@@ -1198,11 +1201,16 @@
+       }
+ 
+       if (isIovec) {
+-         struct iovec *iov = (struct iovec *)src;
+          int err;
+-
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0)
++         struct iovec *iov = (struct iovec *)src;
+          /* The iovec will track bytesCopied internally. */
+          err = memcpy_fromiovec((uint8 *)va + pageOffset, iov, toCopy);
++#else
++         const struct msghdr *msg = src;
++         /* The msg will track bytesCopied internally. */
++         err = memcpy_from_msg((uint8 *)va + pageOffset, (struct msghdr*)msg, toCopy);
++#endif
+          if (err != 0) {
+             if (kernelIf->host) {
+                kunmap(kernelIf->u.h.page[pageIndex]);
+@@ -1273,11 +1281,17 @@
+       }
+ 
+       if (isIovec) {
+-         struct iovec *iov = (struct iovec *)dest;
+          int err;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0)
++         struct iovec *iov = (struct iovec *)dest;
+ 
+          /* The iovec will track bytesCopied internally. */
+          err = memcpy_toiovec(iov, (uint8 *)va + pageOffset, toCopy);
++#else
++         struct msghdr *msg = dest;
++         /* The msg will track bytesCopied internally. */
++         err = memcpy_to_msg(msg, (uint8 *)va + pageOffset, toCopy);
++#endif
+          if (err != 0) {
+             if (kernelIf->host) {
+                kunmap(kernelIf->u.h.page[pageIndex]);

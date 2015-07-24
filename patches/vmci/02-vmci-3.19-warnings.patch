@@ -1,0 +1,77 @@
+--- vmci-only/shared/vm_device_version.h	2015-05-31 06:01:26.000000000 -0700
++++ vmci-only/shared/vm_device_version.h	2015-07-24 01:47:16.064354444 -0700
+@@ -53,7 +53,9 @@
+  *    VMware HD Audio codec
+  *    VMware HD Audio controller
+  */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+ #define PCI_VENDOR_ID_VMWARE                    0x15AD
++#endif
+ #define PCI_DEVICE_ID_VMWARE_SVGA2              0x0405
+ #define PCI_DEVICE_ID_VMWARE_SVGA               0x0710
+ #define PCI_DEVICE_ID_VMWARE_VGA                0x0711
+@@ -102,9 +104,9 @@
+  */
+ #define PCI_VENDOR_ID_AMD               0x1022
+ #define PCI_DEVICE_ID_AMD_VLANCE        0x2000
+-#define PCI_VENDOR_ID_BUSLOGIC			0x104B
+-#define PCI_DEVICE_ID_BUSLOGIC_MULTIMASTER_NC	0x0140
+-#define PCI_DEVICE_ID_BUSLOGIC_MULTIMASTER	0x1040
++#define PCI_VENDOR_ID_BUSLOGIC         0x104B
++#define PCI_DEVICE_ID_BUSLOGIC_MULTIMASTER_NC   0x0140
++#define PCI_DEVICE_ID_BUSLOGIC_MULTIMASTER   0x1040
+ #define PCI_VENDOR_ID_ENSONIQ           0x1274
+ #define PCI_DEVICE_ID_ENSONIQ_ES1371    0x1371
+ 
+@@ -168,18 +170,18 @@
+ #define AHCI_ATAPI_MODEL_STR PRODUCT_GENERIC_NAME " Virtual SATA CDRW Drive"
+ 
+ /************* Strings for IDE Identity Fields **************************/
+-#define VIDE_ID_SERIAL_STR	"00000000000000000001"	/* Must be 20 Bytes */
+-#define VIDE_ID_FIRMWARE_STR	"00000001"		/* Must be 8 Bytes */
++#define VIDE_ID_SERIAL_STR "00000000000000000001"  /* Must be 20 Bytes */
++#define VIDE_ID_FIRMWARE_STR  "00000001"     /* Must be 8 Bytes */
+ 
+ /* No longer than 40 Bytes */
+ #define VIDE_ATA_MODEL_STR PRODUCT_GENERIC_NAME " Virtual IDE Hard Drive"
+ #define VIDE_ATAPI_MODEL_STR PRODUCT_GENERIC_NAME " Virtual IDE CDROM Drive"
+ 
+-#define ATAPI_VENDOR_ID	"NECVMWar"		/* Must be 8 Bytes */
+-#define ATAPI_PRODUCT_ID PRODUCT_GENERIC_NAME " IDE CDROM"	/* Must be 16 Bytes */
+-#define ATAPI_REV_LEVEL	"1.00"			/* Must be 4 Bytes */
++#define ATAPI_VENDOR_ID "NECVMWar"     /* Must be 8 Bytes */
++#define ATAPI_PRODUCT_ID PRODUCT_GENERIC_NAME " IDE CDROM"  /* Must be 16 Bytes */
++#define ATAPI_REV_LEVEL "1.00"         /* Must be 4 Bytes */
+ 
+-#define IDE_NUM_INTERFACES   2	/* support for two interfaces */
++#define IDE_NUM_INTERFACES   2   /* support for two interfaces */
+ #define IDE_DRIVES_PER_IF    2
+ 
+ /************* Strings for SCSI Identity Fields **************************/
+@@ -191,8 +193,8 @@
+ #define SCSI_CDROM_REV_LEVEL "1.0"
+ 
+ /************* SCSI implementation limits ********************************/
+-#define SCSI_MAX_CONTROLLERS	 4	  // Need more than 1 for MSCS clustering
+-#define	SCSI_MAX_DEVICES	 16	  // BT-958 emulates only 16
++#define SCSI_MAX_CONTROLLERS   4   // Need more than 1 for MSCS clustering
++#define  SCSI_MAX_DEVICES   16     // BT-958 emulates only 16
+ #define PVSCSI_MAX_DEVICES       255      // 255 (including the controller)
+ 
+ /************* SATA implementation limits ********************************/
+@@ -252,13 +254,13 @@
+  * Globally unique ID for the VMware device interface. Define INITGUID before including
+  * this header file to instantiate the variable.
+  */
+-DEFINE_GUID(GUID_DEVICE_INTERFACE_VMWARE_USB_DEVICES, 
++DEFINE_GUID(GUID_DEVICE_INTERFACE_VMWARE_USB_DEVICES,
+ 0x2da1fe75, 0xaab3, 0x4d2c, 0xac, 0xdf, 0x39, 0x8, 0x8c, 0xad, 0xa6, 0x65);
+ 
+ /*
+  * Globally unique ID for the VMware device setup class.
+  */
+-DEFINE_GUID(GUID_CLASS_VMWARE_USB_DEVICES, 
++DEFINE_GUID(GUID_CLASS_VMWARE_USB_DEVICES,
+ 0x3b3e62a5, 0x3556, 0x4d7e, 0xad, 0xad, 0xf5, 0xfa, 0x3a, 0x71, 0x2b, 0x56);
+ 
+ /*
