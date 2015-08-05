@@ -83,15 +83,6 @@
  {
     int err;
     int noblock;
-@@ -4776,7 +4802,7 @@
- #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
-    err = skb_copy_datagram_iovec(skb, sizeof *dg, msg->msg_iov, payloadLen);
- #else
--   iov_iter_init(&to, READ, &msg->msg_iter.iov, 1, payloadLen);
-+   iov_iter_init(&to, READ, msg->msg_iter.iov, 1, payloadLen);
-    err = skb_copy_datagram_iter(skb, 0, &to, payloadLen);
- #endif
-    if (err) {
 @@ -4817,13 +4843,20 @@
   *
   *----------------------------------------------------------------------------
