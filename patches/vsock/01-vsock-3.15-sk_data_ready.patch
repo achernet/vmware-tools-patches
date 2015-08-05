@@ -1,0 +1,41 @@
+--- vsock-only/linux/notifyQState.c	2015-05-31 06:01:26.000000000 -0700
++++ vsock-only/linux/notifyQState.c	2015-08-05 00:09:18.771324365 -0700
+@@ -164,7 +164,11 @@
+                      struct sockaddr_vm *dst,    // IN: unused
+                      struct sockaddr_vm *src)    // IN: unused
+ {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 15, 0)
+    sk->sk_data_ready(sk, 0);
++#else
++   sk->sk_data_ready(sk);
++#endif
+ }
+
+
+@@ -566,7 +570,11 @@
+       }
+
+       /* See the comment in VSockVmciNotifyPktSendPostEnqueue */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 15, 0)
+       sk->sk_data_ready(sk, 0);
++#else
++      sk->sk_data_ready(sk);
++#endif
+    }
+
+    return err;
+
+--- vsock-only/linux/notify.c	2015-05-31 06:01:26.000000000 -0700
++++ vsock-only/linux/notify.c	2015-08-05 00:15:07.441733747 -0700
+@@ -516,7 +516,11 @@
+    PKT_FIELD(vsk, sentWaitingRead) = FALSE;
+ #endif
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 15, 0)
+    sk->sk_data_ready(sk, 0);
++#else
++   sk->sk_data_ready(sk);
++#endif
+ }
+
+

@@ -1,0 +1,14 @@
+--- vsock-only/linux/af_vsock.c	2015-08-04 17:35:43.850349079 -0700
++++ vsock-only/linux/af_vsock.c	2015-08-04 17:35:08.086994472 -0700
+@@ -2831,8 +2831,10 @@
+                  vsockVmciProto.slab_obj_size, vsockVmciProto.slab);
+ #elif LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24)
+    sk = sk_alloc(vsockVmciFamilyOps.family, priority, &vsockVmciProto, 1);
+-#else
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 2, 0)
+    sk = sk_alloc(net, vsockVmciFamilyOps.family, priority, &vsockVmciProto);
++#else
++   sk = sk_alloc(net, vsockVmciFamilyOps.family, priority, &vsockVmciProto, 0);
+ #endif
+    if (!sk) {
+       return NULL;
