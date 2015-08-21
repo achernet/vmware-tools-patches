@@ -1,0 +1,15 @@
+--- vmblock-only/linux/inode.c	2015-08-06 21:39:55.171033682 -0700
++++ vmblock-only/linux/inode.c	2015-08-06 21:40:09.018171627 -0700
+@@ -135,7 +135,12 @@
+    inode->i_size = INODE_TO_IINFO(inode)->nameLen;
+    inode->i_version = 1;
+    inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
+    inode->i_uid = inode->i_gid = 0;
++#else
++   inode->i_gid = make_kgid(current_user_ns(), 0);
++   inode->i_uid = make_kuid(current_user_ns(), 0);
++#endif
+    inode->i_op = &LinkInodeOps;
+
+    d_add(dentry, inode);
