@@ -1,0 +1,41 @@
+--- vmblock-only/linux/control.c	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/linux/control.c	2015-08-06 03:26:14.998165547 -0700
+@@ -291,19 +300,38 @@
+    int i;
+    int retval;
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)
+    name = getname(buf);
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)
++   name = (char*)getname(buf)->name;
++#else
++   name = __getname();
++#endif
++
+    if (IS_ERR(name)) {
+       return PTR_ERR(name);
+    }
+
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)
++   i = strncpy_from_user(name, buf, PATH_MAX);
++   if (i < 0 || i == PATH_MAX) {
++      __putname(name);
++      return -EINVAL;
++   }
++#endif
++
+    for (i = strlen(name) - 1; i >= 0 && name[i] == '/'; i--) {
+       name[i] = '\0';
+    }
+
+    retval = i < 0 ? -EINVAL : blockOp(name, blocker);
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)
+    putname(name);
+
++#else
++   __putname(name);
++#endif
+    return retval;
+ }
+
