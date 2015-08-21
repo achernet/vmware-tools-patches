@@ -1,0 +1,30 @@
+--- vmblock-only/linux/control.c	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/linux/control.c	2015-08-06 03:26:14.998165547 -0700
+@@ -208,17 +208,26 @@
+    VMBlockSetProcEntryOwner(controlProcMountpoint);
+
+    /* Create /proc/fs/vmblock/dev */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+    controlProcEntry = create_proc_entry(VMBLOCK_CONTROL_DEVNAME,
+                                         VMBLOCK_CONTROL_MODE,
+                                         controlProcDirEntry);
+-   if (!controlProcEntry) {
++#else
++   controlProcEntry = proc_create(VMBLOCK_CONTROL_DEVNAME,
++                                  VMBLOCK_CONTROL_MODE,
++                                  controlProcDirEntry,
++                                  &ControlFileOps);
++#endif
++   if (controlProcEntry == NULL) {
+       Warning("SetupProcDevice: could not create " VMBLOCK_DEVICE "\n");
+       remove_proc_entry(VMBLOCK_CONTROL_MOUNTPOINT, controlProcDirEntry);
+       remove_proc_entry(VMBLOCK_CONTROL_PROC_DIRNAME, NULL);
+       return -EINVAL;
+    }
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+    controlProcEntry->proc_fops = &ControlFileOps;
++#endif
+    return 0;
+ }
+
