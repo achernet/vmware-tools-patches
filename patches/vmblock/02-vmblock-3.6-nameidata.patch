@@ -1,0 +1,60 @@
+--- vmblock-only/linux/dentry.c	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/linux/dentry.c	2015-08-06 17:44:50.863552959 -0700
+@@ -32,7 +32,11 @@
+ #include "block.h"
+
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0)
+ static int DentryOpRevalidate(struct dentry *dentry, struct nameidata *nd);
++#else
++static int DentryOpRevalidate(struct dentry *dentry, unsigned int flags);
++#endif
+
+ struct dentry_operations LinkDentryOps = {
+    .d_revalidate = DentryOpRevalidate,
+@@ -61,5 +65,9 @@
+ static int
+ DentryOpRevalidate(struct dentry *dentry,  // IN: dentry revalidating
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0)
+                    struct nameidata *nd)   // IN: lookup flags & intent
++#else
++                   unsigned int flags)
++#endif
+ {
+    VMBlockInodeInfo *iinfo;
+@@ -101,7 +109,11 @@
+    if (actualDentry &&
+        actualDentry->d_op &&
+        actualDentry->d_op->d_revalidate) {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0)
+       return actualDentry->d_op->d_revalidate(actualDentry, nd);
++#else
++      return actualDentry->d_op->d_revalidate(actualDentry, flags);
++#endif
+    }
+
+    if (compat_path_lookup(iinfo->name, 0, &actualNd)) {
+--- vmblock-only/linux/inode.c	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/linux/inode.c	2015-08-06 20:52:01.645412587 -0700
+@@ -37,4 +37,9 @@
+ /* Inode operations */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0)
+ static struct dentry *InodeOpLookup(struct inode *dir,
+                                     struct dentry *dentry, struct nameidata *nd);
++#else
++static struct dentry *InodeOpLookup(struct inode *dir,
++                                    struct dentry *dentry, unsigned int flags);
++#endif
+ static int InodeOpReadlink(struct dentry *dentry, char __user *buffer, int buflen);
+@@ -75,7 +80,11 @@
+ static struct dentry *
+ InodeOpLookup(struct inode *dir,      // IN: parent directory's inode
+               struct dentry *dentry,  // IN: dentry to lookup
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0)
+               struct nameidata *nd)   // IN: lookup intent and information
++#else
++              unsigned int flags)     // IN: lookup intent and information
++#endif
+ {
+    char *filename;
+    struct inode *inode;
