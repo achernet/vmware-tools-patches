@@ -1,0 +1,86 @@
+--- vmblock-only/shared/compat_namei.h	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/shared/compat_namei.h	2015-08-05 02:46:08.278235963 -0700
+@@ -23,26 +23,34 @@
+
+ /*
+  * In 2.6.25-rc2, dentry and mount objects were removed from the nameidata
+- * struct. They were both replaced with a struct path.
++ * struct. They were both replaced with a struct path. In 3.19, nameidata
++ * went away such that struct path is operated on directly.
+  */
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 25)
++#define compat_vmw_nd_to_dentry(nd) (nd).dentry
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+ #define compat_vmw_nd_to_dentry(nd) (nd).path.dentry
+ #else
+ #define compat_vmw_nd_to_dentry(nd) (nd).dentry
+ #endif
+
+-/* In 2.6.25-rc2, path_release(&nd) was replaced with path_put(&nd.path). */
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25)
++/* In 2.6.25-rc2, path_release(&nd) was replaced with path_put(&nd.path). In 3.19,
++ * path_put(&nd.path) was simplified to path_put(nd) since nameidata went away. */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 25)
++#define compat_path_release(nd) path_release(nd)
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+ #define compat_path_release(nd) path_put(&(nd)->path)
+ #else
+-#define compat_path_release(nd) path_release(nd)
++#define compat_path_release(nd) path_put(nd)
+ #endif
+
+ /* path_lookup was removed in 2.6.39 merge window VFS merge */
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 38)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 38)
++#define compat_path_lookup(name, flags, nd)     path_lookup(name, flags, nd)
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+ #define compat_path_lookup(name, flags, nd)     kern_path(name, flags, &((nd)->path))
+ #else
+-#define compat_path_lookup(name, flags, nd)     path_lookup(name, flags, nd)
++#define compat_path_lookup(name, flags, nd)     kern_path(name, flags, nd)
+ #endif
+
+ #endif /* __COMPAT_NAMEI_H__ */
+
+--- vmblock-only/linux/dentry.c	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/linux/dentry.c	2015-08-05 02:10:15.317063806 -0700
+@@ -72,6 +72,10 @@
+ {
+    VMBlockInodeInfo *iinfo;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+    struct nameidata actualNd;
++#else
++   struct path actualNd;
++#endif
+    struct dentry *actualDentry;
+    int ret;
+
+--- vmblock-only/linux/filesystem.c	2015-05-31 06:01:25.000000000 -0700
++++ vmblock-only/linux/filesystem.c	2015-08-05 02:03:00.456808518 -0700
+@@ -322,7 +322,11 @@
+ {
+    VMBlockInodeInfo *iinfo;
+    struct inode *inode;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+    struct nameidata actualNd;
++#else
++   struct path actualNd;
++#endif
+
+    ASSERT(sb);
+
+--- vmblock-only/linux/file.c	2015-08-06 23:05:35.904236632 -0700
++++ vmblock-only/linux/file.c	2015-08-05 21:24:06.398267449 -0700
+@@ -134,7 +134,11 @@
+     * and that would try to acquire the inode's semaphore; if the two inodes
+     * are the same we'll deadlock.
+     */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+    if (actualFile->f_dentry && inode == actualFile->f_dentry->d_inode) {
++#else
++   if (actualFile->f_path.dentry && inode == actualFile->f_path.dentry->d_inode) {
++#endif
+       Warning("FileOpOpen: identical inode encountered, open cannot succeed.\n");
+       if (filp_close(actualFile, current->files) < 0) {
+          Warning("FileOpOpen: unable to close opened file.\n");
