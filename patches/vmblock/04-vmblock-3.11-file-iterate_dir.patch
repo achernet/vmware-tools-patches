@@ -1,0 +1,70 @@
+--- vmblock-only/linux/file.c	2015-08-05 06:04:08.569887573 -0700
++++ vmblock-only/linux/file.c	2015-08-05 06:21:06.880993456 -0700
+@@ -38,6 +38,7 @@
+ typedef ino_t inode_num_t;
+ #endif
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)
+ /* Specifically for our filldir_t callback */
+ typedef struct FilldirInfo {
+    filldir_t filldir;
+@@ -78,6 +79,7 @@
+ }
+
+
++#endif
+ /* File operations */
+
+ /*
+@@ -164,13 +166,21 @@
+  *----------------------------------------------------------------------------
+  */
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)
+ static int
+ FileOpReaddir(struct file *file,  // IN
+               void *dirent,       // IN
+               filldir_t filldir)  // IN
++#else
++static int
++FileOpReaddir(struct file *file,  // IN
++              struct dir_context *ctx)  // IN
++#endif
+ {
+    int ret;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)
+    FilldirInfo info;
++#endif
+    struct file *actualFile;
+
+    if (!file) {
+@@ -184,6 +194,7 @@
+       return -EINVAL;
+    }
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)
+    info.filldir = filldir;
+    info.dirent = dirent;
+
+@@ -191,6 +202,9 @@
+    ret = vfs_readdir(actualFile, Filldir, &info);
+    file->f_pos = actualFile->f_pos;
+
++#else
++   ret = iterate_dir(actualFile, ctx);
++#endif
+    return ret;
+ }
+
+@@ -237,7 +251,11 @@
+
+
+ struct file_operations RootFileOps = {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)
+    .readdir = FileOpReaddir,
++#else
++   .iterate = FileOpReaddir,
++#endif
+    .open    = FileOpOpen,
+    .release = FileOpRelease,
+ };
