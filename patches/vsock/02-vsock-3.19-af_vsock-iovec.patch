@@ -1,6 +1,6 @@
 --- vsock-only/linux/af_vsock.c	2015-08-04 18:26:51.705735963 -0700
 +++ vsock-only/linux/af_vsock.c	2015-08-04 19:38:31.284106278 -0700
-@@ -4304,7 +4304,11 @@
+@@ -4302,7 +4302,11 @@
        goto out;
     }
 
@@ -12,7 +12,7 @@
 
     dg->dst = VMCI_MAKE_HANDLE(remoteAddr->svm_cid, remoteAddr->svm_port);
     dg->src = VMCI_MAKE_HANDLE(vsk->localAddr.svm_cid, vsk->localAddr.svm_port);
-@@ -4664,8 +4668,13 @@
+@@ -4662,8 +4666,13 @@
         * able to send.
         */
 
@@ -26,7 +26,7 @@
        if (written < 0) {
           err = -ENOMEM;
           goto outWait;
-@@ -4723,6 +4732,9 @@
+@@ -4721,6 +4730,9 @@
     VMCIDatagram *dg;
     size_t payloadLen;
     struct sk_buff *skb;
@@ -36,7 +36,7 @@
 
     sk = sock->sk;
     noblock = flags & MSG_DONTWAIT;
-@@ -4761,7 +4773,12 @@
+@@ -4759,7 +4771,12 @@
     }
 
     /* Place the datagram payload in the user's iovec. */
@@ -49,7 +49,7 @@
     if (err) {
        goto out;
     }
-@@ -4907,9 +4924,17 @@
+@@ -4905,9 +4922,17 @@
           }
 
           if (flags & MSG_PEEK) {
