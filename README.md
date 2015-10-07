@@ -4,14 +4,14 @@ Patch VMware Tools source code for a variety of VMware Tools and kernel versions
 
 ## Quickest Start (The easiest way)
 
+````bash
+$ git clone https://github.com/rasa/vmware-tools-patches.git
+$ cd vmware-tools-patches
+$ ./patched-open-vm-tools.sh
 ````
-patched-open-vm-tools.sh
-````
-The above script has been provided which generally should always work, automatically invoking commands described in the following section "Quick Start"<p />
+The above script has been provided which generally should always work, automatically invoking commands described in the following section "Quick Start"
 
-Before running this script, it's highly advisable to uncomment the line(remove the leading hash) that verifies and if necessary installs the prerequisites for your package management system (zypper, apt, yum). Leaving this line active ensures that any time your system is updated with a new kernel, when you re-run this script the kernel will be re-patched properly.
-
-To update and re-patch later, remove the "vmware-tools-patches" subdirectory with the previous download and re-run the script.
+To update and re-patch later, remove the `vmware-tools-patches` subdirectory with the previous download and re-run the script.
 
 ## Quick Start
 
@@ -77,6 +77,7 @@ We have not received any reports of the patches failing on the following kernels
 The included patches have been tested with the following versions of VMware Tools:
 
 
+* [VMwareTools-10.0.0-2977863.tar.gz](https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/8.0.0/2985594/packages/com.vmware.fusion.tools.linux.zip.tar) (VMware Fusion 8.0.0 & Workstation 12.0.0)
 * [VMwareTools-9.9.3-2759765.tar.gz](https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/7.1.2/2779224/packages/com.vmware.fusion.tools.linux.zip.tar) (VMware Fusion 7.1.2 & Workstation 11.1.2)
 * [VMwareTools-9.9.2-2496486.tar.gz](https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/7.1.1/2498930/packages/com.vmware.fusion.tools.linux.zip.tar) (VMware Fusion 7.1.1 & Workstation 11.1.0)
 * [VMwareTools-9.9.0-2304977.tar.gz](https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/7.1.0/2314774/packages/com.vmware.fusion.tools.linux.zip.tar) (VMware Fusion 7.1.0 & Workstation 11.0.0)
