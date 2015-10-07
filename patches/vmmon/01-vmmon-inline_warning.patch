@@ -1,0 +1,11 @@
+--- vmmon-only/linux/driver.c	2015-07-05 20:26:02.854367622 -0700
++++ vmmon-only/linux/driver.c	2015-07-05 20:27:18.465140873 -0700
+@@ -1328,7 +1328,7 @@
+  *-----------------------------------------------------------------------------
+  */
+ 
+-__attribute__((always_inline)) static Bool
++static INLINE_SINGLE_CALLER Bool
+ LinuxDriverSyncReadTSCs(uint64 *delta) // OUT: TSC max - TSC min
+ {
+    TSCDelta tscDelta;
