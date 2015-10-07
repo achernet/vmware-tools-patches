@@ -1,0 +1,17 @@
+--- vmmon-only/linux/driver.c	2015-10-06 22:15:19.659853866 -0700
++++ vmmon-only/linux/driver.c	2015-10-06 22:15:37.172046514 -0700
+@@ -400,10 +400,14 @@
+ #ifdef VMX86_DEVEL
+    unregister_chrdev(linuxState.major, linuxState.deviceName);
+ #else
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
++   misc_deregister(&linuxState.misc);
++#else
+    if (misc_deregister(&linuxState.misc)) {
+       Warning("Module %s: error unregistering\n", linuxState.deviceName);
+    }
+ #endif
++#endif
+
+    Log("Module %s: unloaded\n", linuxState.deviceName);
+
